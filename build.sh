@@ -13,7 +13,16 @@ REPO="https://github.com/rsd/libfprint.git"
 BRANCH="sigfm-0078"
 
 if ! command -v meson >/dev/null || ! command -v ninja >/dev/null; then
-  echo "meson and ninja are required: sudo pacman -S --needed meson ninja doctest opencv" >&2
+  echo "meson and ninja are required." >&2
+  if command -v pacman >/dev/null; then
+    echo "Install them with: sudo pacman -S --needed meson ninja doctest opencv" >&2
+  elif command -v apt >/dev/null; then
+    echo "Install them with: sudo apt install meson ninja-build libopencv-dev libdoctest-dev" >&2
+  elif command -v dnf >/dev/null; then
+    echo "Install them with: sudo dnf install meson ninja-build opencv-devel doctest-devel" >&2
+  else
+    echo "Install meson, ninja, OpenCV, and doctest development packages for your distribution." >&2
+  fi
   exit 1
 fi
 

@@ -108,6 +108,55 @@ sudo systemctl restart fprintd
 
 Alternatively, run `./build.sh`.
 
+### Other distributions
+
+The build itself is distribution-independent. Install the development packages
+for meson, ninja, GLib, GUsb, libgudev, pixman, OpenSSL, NSS, polkit, systemd,
+OpenCV, and doctest.
+
+Ubuntu / Debian:
+
+```bash
+sudo apt install git meson ninja-build build-essential pkg-config \
+  libglib2.0-dev libgusb-dev libgudev-1.0-dev libpixman-1-dev \
+  libssl-dev libnss3-dev libpolkit-gobject-1-dev libsystemd-dev \
+  libopencv-dev libdoctest-dev fprintd libpam-fprintd
+```
+
+Fedora:
+
+```bash
+sudo dnf install git meson ninja-build gcc gcc-c++ pkgconf-pkg-config \
+  glib2-devel libgusb-devel libgudev-devel pixman-devel openssl-devel \
+  nss-devel polkit-devel systemd-devel opencv-devel doctest-devel fprintd
+```
+
+PAM service names differ by distribution and desktop:
+
+| Target | PAM file |
+| --- | --- |
+| sudo | `/etc/pam.d/sudo` |
+| KDE Plasma Login Manager | `/etc/pam.d/plasmalogin` |
+| KDE lock screen | `kde-fingerprint` (provided by kscreenlocker) |
+| SDDM | `/etc/pam.d/sddm` |
+| GDM / GNOME | `/etc/pam.d/gdm-password` or `gdm-fingerprint` |
+| polkit | `/etc/pam.d/polkit-1` |
+
+On Ubuntu/Debian, `pam-auth-update` can enable fingerprint authentication. On
+Fedora, `authselect` can enable the `with-fingerprint` feature.
+
+The `spidev.bufsiz=32768` module option is distribution-independent. If the
+distribution's libfprint package does not provide the ELAN7001 spidev binding
+rule, add it to `/etc/udev/rules.d/`:
+
+```
+ACTION=="add|change", SUBSYSTEM=="spi", ENV{MODALIAS}=="acpi:ELAN7001:", RUN{builtin}+="kmod load spi:spidev", RUN+="/bin/sh -c 'echo spidev > %S%p/driver_override && echo %k > %S%p/subsystem/drivers/spidev/bind'"
+```
+
+The custom library is built against libfprint 1.94.100. If the distribution's
+`fprintd` uses a different libfprint ABI, rebuild from a matching source
+version instead of using this exact tree.
+
 ## Rollback
 
 ```bash
