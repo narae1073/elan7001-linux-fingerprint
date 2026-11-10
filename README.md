@@ -22,8 +22,9 @@ ASUS VivoBook X421EA / X413EA, CachyOS/Arch, KDE Plasma 6.8.
    the narrow swipe images produced by this sensor (`verify-no-match`, score
    `0/24`). SIGFM is required.
 3. **Scan mode**: Windows behaves like a touch sensor, but the Linux `elanspi`
-   driver uses a swipe state machine. Swipe slowly from top to bottom; holding
-   the finger still is not enough.
+   driver uses a swipe state machine. Swipe slowly across the full sensor in
+   either direction (bottom-to-top works too); holding the finger still is not
+   enough.
 
 ## Changes
 
@@ -47,7 +48,7 @@ loads the patched library.
 ## Usage
 
 ```bash
-# Enroll (7 slow top-to-bottom swipes)
+# Enroll (7 slow full-length swipes; bottom-to-top works too)
 fprintd-enroll -f right-index-finger
 
 # Verify
@@ -131,4 +132,5 @@ fprintd-delete "$USER" -f right-index-finger
 - After a kernel or `spidev` update, verify that
   `cat /sys/module/spidev/parameters/bufsiz` returns `32768`.
 - A short or fast swipe can produce `enroll-swipe-too-short`; swipe slowly
-  across the full sensor.
+  across the full sensor. Both swipe directions work; bottom-to-top is fine and
+  often more comfortable.
